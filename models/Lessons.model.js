@@ -2,10 +2,11 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const lessonsSchema = new Schema({
+  teacher: String,
   title: String,
   styles: [String],
   location: String,
-  hour: String,
+  hours: String,
   days: String,
   firstDay: Date,
   lastDay: Date,
