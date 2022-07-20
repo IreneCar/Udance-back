@@ -4,15 +4,15 @@ const { Schema, model } = mongoose;
 const lessonsSchema = new Schema({
   teacher: String,
   title: String,
-  styles: [String],
+  styles: String,
   location: String,
   hours: String,
   days: String,
-  firstDay: Date,
-  lastDay: Date,
-  price: Number,
+  firstDay: String,
+  lastDay: String,
+  price: String,
   details: String,
-  cohost: [String],
+  cohost: String,
   image: String,
 });
 
