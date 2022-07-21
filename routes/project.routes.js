@@ -3,13 +3,21 @@ const router = express.Router();
 const mongoose = require('mongoose');
 
 const Lesson = require('../models/Lesson.model');
+const User = require('../models/User.model');
 
 //  POST /api/projects  -  Creates a new project
 router.post('/lessons', (req, res, next) => {
 	const {teacher, title, styles,location,hours,days, firstDay,lastDay, price, details,cohost,image } = req.body;
 
 	Lesson.create({ teacher, title, styles,location,hours,days, firstDay,lastDay, price, details,cohost,image })
-		.then((response) => res.json(response))
+		
+	.then((newLesson) => {
+		return User.findByIdAndUpdate(req.payload._id, {
+			$push: { givedLessons: newLesson._id }
+		});
+	})
+	
+	.then((response) => res.json(response))
 		.catch((err) => res.json(err));
 });
 
