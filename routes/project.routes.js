@@ -43,7 +43,7 @@ router.get('/lessons', (req, res, next) => {
  });
 
 
- router.get('/lessons/:lessonId/join', (req, res, next) => {
+ router.post('/lessons/:lessonId/join', (req, res, next) => {
 	const { lessonId } = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(lessonId)) {
@@ -52,16 +52,21 @@ router.get('/lessons', (req, res, next) => {
 
 	}
 
-
-	User.findByIdAndUpdate(req.payload._id, {
-		$push: { receivedLessons: lessonId }
+	User.findById(req.payload._id)
+	.then((userLogged) => {console.log(!userLogged.receivedLessons.includes(lessonId))
+		if(!userLogged.receivedLessons.includes(lessonId)){
+		console.log(userLogged.receivedLessons)
+			 User.findByIdAndUpdate(req.payload._id, {
+	 	$push: { receivedLessons: lessonId }
+	 }).then(()=>{})
+	 
+		}
+		
 	})
+	
 
-
-
-
-		.then((lesson) => res.status(200).json(lesson))
-		.catch((error) => res.json(error));
+	 	.then((lesson) => res.status(200).json(lesson))
+	 	.catch((error) => res.json(error));
 });
 
 router.get('/lessons/:lessonId/dropOff', (req, res, next) => {
