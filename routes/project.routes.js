@@ -27,21 +27,63 @@ router.get('/lessons', (req, res, next) => {
 });
 
 //  GET /api/projects/:projectId -  Retrieves a specific project by id
-// router.get('/projects/:projectId', (req, res, next) => {
-// 	const { projectId } = req.params;
+ router.get('/lessons/:lessonId', (req, res, next) => {
+ 	const { lessonId } = req.params;
 
-// 	if (!mongoose.Types.ObjectId.isValid(projectId)) {
-// 		res.status(400).json({ message: 'Specified id is not valid' });
-// 		return;
-// 	}
+ 	if (!mongoose.Types.ObjectId.isValid(lessonId)) {
+ 		res.status(400).json({ message: 'Specified id is not valid' });
+ 		return;
+ 	}
 
-// 	// Each Project document has `tasks` array holding `_id`s of Task documents
-// 	// We use .populate() method to get swap the `_id`s for the actual Task documents
-// 	Project.findById(projectId)
-// 		.populate('tasks')
-// 		.then((project) => res.status(200).json(project))
-// 		.catch((error) => res.json(error));
-// });
+
+ 	Lesson.findById(lessonId)
+
+ 		.then((lesson) => res.status(200).json(lesson))
+ 		.catch((error) => res.json(error));
+ });
+
+
+ router.get('/lessons/:lessonId/join', (req, res, next) => {
+	const { lessonId } = req.params;
+
+	if (!mongoose.Types.ObjectId.isValid(lessonId)) {
+		res.status(400).json({ message: 'Specified id is not valid' });
+		return;
+
+	}
+
+
+	User.findByIdAndUpdate(req.payload._id, {
+		$push: { receivedLessons: lessonId }
+	})
+
+
+
+
+		.then((lesson) => res.status(200).json(lesson))
+		.catch((error) => res.json(error));
+});
+
+router.get('/lessons/:lessonId/dropOff', (req, res, next) => {
+	const { lessonId } = req.params;
+
+	if (!mongoose.Types.ObjectId.isValid(lessonId)) {
+		res.status(400).json({ message: 'Specified id is not valid' });
+		return;
+
+	}
+
+
+	User.findByIdAndUpdate(req.payload._id, {
+		$pull: { receivedLessons: lessonId }
+	})
+
+
+
+
+		.then((lesson) => res.status(200).json(lesson))
+		.catch((error) => res.json(error));
+});
 
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
 // router.put('/projects/:projectId', (req, res, next) => {
