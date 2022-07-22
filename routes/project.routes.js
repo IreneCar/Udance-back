@@ -5,8 +5,34 @@ const mongoose = require('mongoose');
 const Lesson = require('../models/Lesson.model');
 const User = require('../models/User.model');
 
+
+router.get('/profile', (req, res, next) => {
+	
+	User.findById(req.payload._id)
+	.populate("receivedLessons")
+	.populate("givedLessons")
+	.then((user) => res.json(user)).catch((err) => res.json(err));
+});
+
+router.get('/profile/gived', (req, res, next) => {
+	
+	User.findById(req.payload._id)
+	.populate("givedLessons")
+	.then((user) => res.json(user.givedLessons)).catch((err) => res.json(err));
+});
+
+router.get('/profile/received', (req, res, next) => {
+	
+	User.findById(req.payload._id)
+	.populate("receivedLessons")
+	
+	.then((user) => res.json(user.receivedLessons)).catch((err) => res.json(err));
+});
+
+
+
 //  POST /api/projects  -  Creates a new project
-router.post('/lessons', (req, res, next) => {
+router.post('/lessons', (req, res, next) => {console.log("lessons")
 	const {teacher, title, styles,location,hours,days, firstDay,lastDay, price, details,cohost,image } = req.body;
 
 	Lesson.create({ teacher, title, styles,location,hours,days, firstDay,lastDay, price, details,cohost,image })
@@ -53,9 +79,9 @@ router.get('/lessons', (req, res, next) => {
 	}
 
 	User.findById(req.payload._id)
-	.then((userLogged) => {console.log(!userLogged.receivedLessons.includes(lessonId))
+	.then((userLogged) => {
 		if(!userLogged.receivedLessons.includes(lessonId)){
-		console.log(userLogged.receivedLessons)
+		
 			 User.findByIdAndUpdate(req.payload._id, {
 	 	$push: { receivedLessons: lessonId }
 	 }).then(()=>{})
