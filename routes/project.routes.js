@@ -130,6 +130,15 @@ router.get("/lessons/:lessonId/dropOff", (req, res, next) => {
     .catch((error) => res.json(error));
 });
 
+// PUT  Updates the profile details
+router.put('/profile/edit', (req, res, next) => {
+
+
+	User.findByIdAndUpdate(req.payload._id, req.body, { new: true })
+		.then((updatedProfile) => res.json(updatedProfile))
+		.catch((error) => res.json(error));
+});
+
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
 // router.put('/projects/:projectId', (req, res, next) => {
 // 	const { projectId } = req.params;
