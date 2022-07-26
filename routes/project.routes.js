@@ -1,12 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const cloudinary =require("../config/cloudinary")
+const upload =require("../config/multer")
 
 const Lesson = require("../models/Lesson.model");
 const User = require("../models/User.model");
 
 router.get("/profile", (req, res, next) => {
-  console.log("me piden el profile");
+
   User.findById(req.payload._id)
     .populate("receivedLessons")
     .populate("givedLessons")
@@ -131,13 +133,54 @@ router.get("/lessons/:lessonId/dropOff", (req, res, next) => {
 });
 
 // PUT  Updates the profile details
-router.put('/profile/edit', (req, res, next) => {
+router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
+  try{console.log("entro en edit")
+ 
 
+ 
+  const { name, description,danceStyles,existingId,existingUrl } = req.body;
+  
+  let imageUrl;
+  let imageId;
+  if(existingId){console.log("hay ID")
 
-	User.findByIdAndUpdate(req.payload._id, req.body, { new: true })
-		.then((updatedProfile) => res.json(updatedProfile))
-		.catch((error) => res.json(error));
+    if (req.file) {console.log("hay file")
+      let user = await User.findById(req.payload._id);
+      await cloudinary.uploader.destroy(user.imageId);
+      const result=await cloudinary.uploader.upload(
+        req.file.path,{upload_preset:"uploaded"})
+      imageUrl = result.secure_url;
+      imageId=result.public_id
+    } else { console.log("no hay file")
+      imageUrl = existingUrl;
+      imageId = existingId
+      }
+    }
+  else{console.log("no hay id")
+    if (req.file) {console.log("hay file")
+      
+      
+      const result=await cloudinary.uploader.upload(
+        req.file.path,{upload_preset:"uploaded"})
+       
+      imageUrl = result.secure_url;
+      imageId=result.public_id
+      
+    } else { console.log("no hay file")
+      imageUrl = existingUrl;
+      imageId = existingId
+      }
+  }
+
+console.log("a por el user")
+  const user =await User.findByIdAndUpdate(req.payload._id,{name,description,danceStyles,imageId,imageUrl},{new:true})
+  
+  res.json(user); // <=== added
+} catch (err) {
+  console.log(err)
+}
 });
+
 
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
 // router.put('/projects/:projectId', (req, res, next) => {
