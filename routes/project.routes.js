@@ -168,7 +168,7 @@ router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
       
     } else { console.log("no hay file")
       imageUrl = existingUrl;
-      imageId = existingId
+     
       }
   }
 
