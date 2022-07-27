@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const cloudinary =require("../config/cloudinary")
 const upload =require("../config/multer")
-
+const nodemailer = require ("nodemailer")
 const Lesson = require("../models/Lesson.model");
 const User = require("../models/User.model");
 
@@ -164,6 +164,7 @@ router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
   console.log(err)
 }
 });
+
 
 
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
