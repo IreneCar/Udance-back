@@ -33,7 +33,7 @@ router.get("/profile/received", (req, res, next) => {
 
 //  POST /api/projects  -  Creates a new project
 router.post("/lessons", (req, res, next) => {
-  console.log("lessons");
+  
   const {
     teacher,
     title,
@@ -75,6 +75,7 @@ router.post("/lessons", (req, res, next) => {
 });
 
 router.get("/lessons", (req, res, next) => {
+
   Lesson.find()
     .then((allLessons) => res.json(allLessons))
     .catch((err) => res.json(err));
