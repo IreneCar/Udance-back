@@ -15,7 +15,11 @@ const authRouter = require("./routes/auth.routes");
 app.use("/api/auth", authRouter);
 
 const projectRouter = require("./routes/project.routes");
-app.use("/api", isAuthenticated, projectRouter); // <== UPDATE
+app.use("/api", projectRouter); // <== UPDATE
+
+const projectRouterAuth = require("./routes/project.routes.auth");
+app.use("/api", isAuthenticated, projectRouterAuth); // <== UPDATE
+
 
 
 // app.use((req, res, next) => {
