@@ -30,36 +30,7 @@ console.log("me piden lessons")
       .catch((error) => res.json(error));
   });
 
-  router.post("/send-email", (req, res, next) => {
-   
-    var transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL, // generated ethereal user
-        pass: process.env.PASSWORD, // generated ethereal password
-      },
-    });
-  
-  var mailOptions={
-    from:`"Mail prueba"<iron@iron.com>`,
-    to:"rubengh88@gmail.com,iron@iron.com",
-    subject:"enviado desde nodemailer",
-    text:"Mensaje enviado"
-  }
-  
-  transporter.sendMail(mailOptions,(error,info)=>{
-    if(error){
-      res.status(500).send(error.message)
-    }else{
-      console.log("mail enviado")
-      res.status(200).jsonp(req.body)
-    }
-  })
-  
-   
-  });
+
 
 
 module.exports = router;

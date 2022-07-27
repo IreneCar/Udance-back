@@ -86,13 +86,19 @@ router.post("/lessons/:lessonId/join", (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+  
 
   User.findById(req.payload._id)
     .then((userLogged) => {
       if (!userLogged.receivedLessons.includes(lessonId)) {
         User.findByIdAndUpdate(req.payload._id, {
           $push: { receivedLessons: lessonId },
-        }).then(() => {});
+        }).then(() => {
+          Lesson.findByIdAndUpdate(lessonId,{
+            $push: { students: req.payload._id } 
+          }).then(()=>{})
+
+        });
       }
     })
 
@@ -111,8 +117,15 @@ router.get("/lessons/:lessonId/dropOff", (req, res, next) => {
   User.findByIdAndUpdate(req.payload._id, {
     $pull: { receivedLessons: lessonId },
   })
+  .then(()=>{
+    Lesson.findByIdAndUpdate(lessonId, {
+      $pull: { students: req.payload._id },
+    }).then((lesson) => res.status(200).json(lesson))
 
-    .then((lesson) => res.status(200).json(lesson))
+  })
+  
+
+    
     .catch((error) => res.json(error));
 });
 
@@ -165,6 +178,55 @@ router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
 }
 });
 
+
+router.post("/:lessonId/send-email", (req, res, next) => {
+  const { lessonId } = req.params;
+
+  let receivers=["rubengh88@gmail.com"]
+
+  Lesson.findById(lessonId)
+  .populate("students")
+  .then((lesson)=>{
+    lesson.students.forEach((student)=>{
+      receivers.push(student.email)
+    })
+  }).then(()=>{
+    let rec=["rubengh88@gmail.com","iron@iron.com"]
+  var transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL, // generated ethereal user
+      pass: process.env.PASSWORD, // generated ethereal password
+    },
+  });
+
+
+  receivers.forEach((receiver)=>{
+
+
+var mailOptions={
+  from:`"Mail prueba"<iron@iron.com>`,
+  to:`${receiver}`,
+  subject:"enviado desde nodemailer",
+  text:`${req.body.message}`
+}
+
+transporter.sendMail(mailOptions,(error,info)=>{
+  if(error){
+    res.status(500).send(error.message)
+  }else{
+    console.log("mail enviado")
+    res.status(200).jsonp(req.body)
+  }
+})
+
+  })
+  })
+
+ 
+});
 
 
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
