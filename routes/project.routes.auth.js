@@ -171,7 +171,7 @@ router.put("/profile/edit", upload.single("image"), async (req, res, next) => {
       { new: true }
     );
 
-    res.json(user); // <=== added
+    res.json(user); 
   } catch (err) {
     console.log(err);
   }
@@ -195,8 +195,8 @@ router.post("/profile/:lessonId/send-email", (req, res, next) => {
         port: 465,
         secure: true, // true for 465, false for other ports
         auth: {
-          user: process.env.EMAIL, // generated ethereal user
-          pass: process.env.PASSWORD, // generated ethereal password
+          user: process.env.EMAIL, 
+          pass: process.env.PASSWORD, 
         },
       });
 
@@ -290,49 +290,9 @@ User.updateMany({ receivedLessons: `${lessonId}` },
     
     })
 
-
-
-
-
     });
-   
   
-
-  
-
 
 })
-
-// PUT  /api/projects/:projectId  -  Updates a specific project by id
-// router.put('/projects/:projectId', (req, res, next) => {
-// 	const { projectId } = req.params;
-
-// 	if (!mongoose.Types.ObjectId.isValid(projectId)) {
-// 		res.status(400).json({ message: 'Specified id is not valid' });
-// 		return;
-// 	}
-
-// 	Project.findByIdAndUpdate(projectId, req.body, { new: true })
-// 		.then((updatedProject) => res.json(updatedProject))
-// 		.catch((error) => res.json(error));
-// });
-
-// DELETE  /api/projects/:projectId  -  Deletes a specific project by id
-// router.delete('/projects/:projectId', (req, res, next) => {
-// 	const { projectId } = req.params;
-
-// 	if (!mongoose.Types.ObjectId.isValid(projectId)) {
-// 		res.status(400).json({ message: 'Specified id is not valid' });
-// 		return;
-// 	}
-
-// 	Project.findByIdAndRemove(projectId)
-// 		.then(() =>
-// 			res.json({
-// 				message: `Project with ${projectId} is removed successfully.`
-// 			})
-// 		)
-// 		.catch((error) => res.json(error));
-// });
 
 module.exports = router;
