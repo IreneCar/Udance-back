@@ -9,6 +9,7 @@ const nodemailer = require ("nodemailer")
 router.get("/lessons", (req, res, next) => {
 
   Lesson.find()
+  .populate("teacher")
     .then((allLessons) => res.json(allLessons))
     .catch((err) => res.json(err));
 });

@@ -35,7 +35,6 @@ router.get("/profile/received", (req, res, next) => {
 router.post("/lessons", (req, res, next) => {
   
   const {
-    teacher,
     title,
     styles,
     location,
@@ -49,6 +48,8 @@ router.post("/lessons", (req, res, next) => {
     image,
   } = req.body;
 
+  teacher=req.payload._id;
+  
   Lesson.create({
     teacher,
     title,

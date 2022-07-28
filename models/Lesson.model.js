@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const lessonsSchema = new Schema({
-  teacher: String,
+  teacher: { type: Schema.Types.ObjectId, ref: "User" },
   students: [{ type: Schema.Types.ObjectId, ref: "User" }],
   title: String,
   styles: String,
