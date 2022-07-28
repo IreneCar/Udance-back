@@ -76,7 +76,7 @@ router.post("/lessons", (req, res, next) => {
 
 
 
-//  GET /api/projects/:projectId -  Retrieves a specific project by id
+//  GET /api/projects/:projectId -  Retrieves a specific lesson by id
 
 
 router.post("/lessons/:lessonId/join", (req, res, next) => {
