@@ -1,14 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const cloudinary =require("../config/cloudinary")
-const upload =require("../config/multer")
-const nodemailer = require ("nodemailer")
+const cloudinary = require("../config/cloudinary");
+const upload = require("../config/multer");
+const nodemailer = require("nodemailer");
 const Lesson = require("../models/Lesson.model");
 const User = require("../models/User.model");
 
 router.get("/profile", (req, res, next) => {
-
   User.findById(req.payload._id)
     .populate("receivedLessons")
     .populate("givedLessons")
@@ -18,13 +17,15 @@ router.get("/profile", (req, res, next) => {
 
 router.get("/profile/gived", (req, res, next) => {
   User.findById(req.payload._id)
-    .populate({path:"givedLessons",
-  populate:{
-    path:"teacher"
-  }})
+    .populate({
+      path: "givedLessons",
+      populate: {
+        path: "teacher",
+      },
+    })
     .then((user) => {
-      res.json(user.givedLessons)}
-    )
+      res.json(user.givedLessons);
+    })
     .catch((err) => res.json(err));
 });
 
@@ -41,7 +42,6 @@ router.get("/profile/received", (req, res, next) => {
 
 //  POST /api/projects  -  Creates a new project
 router.post("/lessons", (req, res, next) => {
-  
   const {
     title,
     styles,
@@ -56,7 +56,8 @@ router.post("/lessons", (req, res, next) => {
     image,
   } = req.body;
 
-  teacher=req.payload._id;
+
+  teacher = req.payload._id;
 
   Lesson.create({
     teacher,
@@ -83,10 +84,7 @@ router.post("/lessons", (req, res, next) => {
     .catch((err) => res.json(err));
 });
 
-
-
 //  GET /api/projects/:projectId -  Retrieves a specific lesson by id
-
 
 router.post("/lessons/:lessonId/join", (req, res, next) => {
   const { lessonId } = req.params;
@@ -95,7 +93,6 @@ router.post("/lessons/:lessonId/join", (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  
 
   User.findById(req.payload._id)
     .then((userLogged) => {
@@ -103,10 +100,9 @@ router.post("/lessons/:lessonId/join", (req, res, next) => {
         User.findByIdAndUpdate(req.payload._id, {
           $push: { receivedLessons: lessonId },
         }).then(() => {
-          Lesson.findByIdAndUpdate(lessonId,{
-            $push: { students: req.payload._id } 
-          }).then(()=>{})
-
+          Lesson.findByIdAndUpdate(lessonId, {
+            $push: { students: req.payload._id },
+          }).then(() => {});
         });
       }
     })
@@ -126,120 +122,105 @@ router.get("/lessons/:lessonId/dropOff", (req, res, next) => {
   User.findByIdAndUpdate(req.payload._id, {
     $pull: { receivedLessons: lessonId },
   })
-  .then(()=>{
-    Lesson.findByIdAndUpdate(lessonId, {
-      $pull: { students: req.payload._id },
-    }).then((lesson) => res.status(200).json(lesson))
+    .then(() => {
+      Lesson.findByIdAndUpdate(lessonId, {
+        $pull: { students: req.payload._id },
+      }).then((lesson) => res.status(200).json(lesson));
+    })
 
-  })
-  
-
-    
     .catch((error) => res.json(error));
 });
 
 // PUT  Updates the profile details
-router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
-  try{
- 
+router.put("/profile/edit", upload.single("image"), async (req, res, next) => {
+  try {
+    const { name, description, danceStyles, existingId, existingUrl } =
+      req.body;
 
- 
-  const { name, description,danceStyles,existingId,existingUrl } = req.body;
-  
-  let imageUrl;
-  let imageId;
-  if(existingId){
+    let imageUrl;
+    let imageId;
+    if (existingId) {
+      if (req.file) {
+        let user = await User.findById(req.payload._id);
+        await cloudinary.uploader.destroy(user.imageId);
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          upload_preset: "uploaded",
+        });
+        imageUrl = result.secure_url;
+        imageId = result.public_id;
+      } else {
+        imageUrl = existingUrl;
+        imageId = existingId;
+      }
+    } else {
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          upload_preset: "uploaded",
+        });
 
-    if (req.file) {
-      let user = await User.findById(req.payload._id);
-      await cloudinary.uploader.destroy(user.imageId);
-      const result=await cloudinary.uploader.upload(
-        req.file.path,{upload_preset:"uploaded"})
-      imageUrl = result.secure_url;
-      imageId=result.public_id
-    } else { 
-      imageUrl = existingUrl;
-      imageId = existingId
+        imageUrl = result.secure_url;
+        imageId = result.public_id;
+      } else {
+        imageUrl = existingUrl;
       }
     }
-  else{
-    if (req.file) {
-      
-      
-      const result=await cloudinary.uploader.upload(
-        req.file.path,{upload_preset:"uploaded"})
-       
-      imageUrl = result.secure_url;
-      imageId=result.public_id
-      
-    } else { 
-      imageUrl = existingUrl;
-     
-      }
+
+    const user = await User.findByIdAndUpdate(
+      req.payload._id,
+      { name, description, danceStyles, imageId, imageUrl },
+      { new: true }
+    );
+
+    res.json(user); // <=== added
+  } catch (err) {
+    console.log(err);
   }
-
-
-  const user =await User.findByIdAndUpdate(req.payload._id,{name,description,danceStyles,imageId,imageUrl},{new:true})
-  
-  res.json(user); // <=== added
-} catch (err) {
-  console.log(err)
-}
 });
-
 
 router.post("/profile/:lessonId/send-email", (req, res, next) => {
   const { lessonId } = req.params;
 
-
-  let receivers=["rubengh88@gmail.com"]
+  let receivers = ["rubengh88@gmail.com"];
 
   Lesson.findById(lessonId)
-  .populate("students")
-  .then((lesson)=>{
-    lesson.students.forEach((student)=>{
-      receivers.push(student.email)
+    .populate("students")
+    .then((lesson) => {
+      lesson.students.forEach((student) => {
+        receivers.push(student.email);
+      });
     })
-  }).then(()=>{
-   
-  var transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-      user: process.env.EMAIL, // generated ethereal user
-      pass: process.env.PASSWORD, // generated ethereal password
-    },
-  });
+    .then(() => {
+      var transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: process.env.EMAIL, // generated ethereal user
+          pass: process.env.PASSWORD, // generated ethereal password
+        },
+      });
 
-  User.findById(req.payload._id).then((user)=>{
-    receivers.forEach((receiver)=>{
+      User.findById(req.payload._id).then((user) => {
+        receivers.forEach((receiver) => {
+          var mailOptions = {
+            from: `${user.name}<iron@iron.com>`,
+            to: `${receiver}`,
+            subject: "enviado desde nodemailer",
+            text: `${req.body.message}`,
+          };
 
-
-      var mailOptions={
-        from:`${user.name}<iron@iron.com>`,
-        to:`${receiver}`,
-        subject:"enviado desde nodemailer",
-        text:`${req.body.message}`
-      }
-      
-      transporter.sendMail(mailOptions,(error,info)=>{
-        if(error){
-          res.status(500).send(error.message)
-        }else{
-          console.log("mail enviado")
-          res.status(200).jsonp(req.body)
-        }
-      })
-      
-  })
-  
-  })
-  })
-
- 
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              res.status(500).send(error.message);
+            } else {
+              console.log("mail enviado");
+              res.status(200).jsonp(req.body);
+            }
+          });
+        });
+      });
+    });
 });
-
 
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
 // router.put('/projects/:projectId', (req, res, next) => {
