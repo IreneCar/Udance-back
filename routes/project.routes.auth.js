@@ -179,8 +179,9 @@ router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
 });
 
 
-router.post("/:lessonId/send-email", (req, res, next) => {
+router.post("/profile/:lessonId/send-email", (req, res, next) => {
   const { lessonId } = req.params;
+
 
   let receivers=["rubengh88@gmail.com"]
 
@@ -191,7 +192,7 @@ router.post("/:lessonId/send-email", (req, res, next) => {
       receivers.push(student.email)
     })
   }).then(()=>{
-    let rec=["rubengh88@gmail.com","iron@iron.com"]
+   
   var transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
