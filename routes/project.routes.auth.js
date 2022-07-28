@@ -31,12 +31,10 @@ router.get("/profile/gived", (req, res, next) => {
 
 router.get("/profile/received", (req, res, next) => {
   User.findById(req.payload._id)
-    .populate({
-      path: "receivedLessons",
-      populate: {
-        path: "teacher",
-      },
-    })
+  .populate({path:"receivedLessons",
+  populate:{
+    path:"teacher"
+  }})
 
     .then((user) => res.json(user.receivedLessons))
     .catch((err) => res.json(err));
