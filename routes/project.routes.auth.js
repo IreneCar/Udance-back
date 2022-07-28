@@ -18,8 +18,13 @@ router.get("/profile", (req, res, next) => {
 
 router.get("/profile/gived", (req, res, next) => {
   User.findById(req.payload._id)
-    .populate("givedLessons")
-    .then((user) => res.json(user.givedLessons))
+    .populate({path:"givedLessons",
+  populate:{
+    path:"teacher"
+  }})
+    .then((user) => {
+      res.json(user.givedLessons)}
+    )
     .catch((err) => res.json(err));
 });
 
@@ -132,7 +137,7 @@ router.get("/lessons/:lessonId/dropOff", (req, res, next) => {
 
 // PUT  Updates the profile details
 router.put('/profile/edit',upload.single('image'),async  (req, res, next) => {
-  try{console.log("entro en edit")
+  try{
  
 
  

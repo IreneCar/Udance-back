@@ -23,6 +23,7 @@ router.get("/lessons/:lessonId", (req, res, next) => {
   }
 
   Lesson.findById(lessonId)
+  .populate("teacher")
 
     .then((lesson) => res.status(200).json(lesson))
     .catch((error) => res.json(error));
