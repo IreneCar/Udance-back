@@ -3,6 +3,10 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Lesson = require("../models/Lesson.model");
 const User = require("../models/User.model");
+const nodemailer = require ("nodemailer")
+let aws = require("@aws-sdk/client-ses");
+let { defaultProvider } = require("@aws-sdk/credential-provider-node");
+
 
 router.get("/lessons", (req, res, next) => {
   console.log("me piden lessons");

@@ -3,6 +3,7 @@ const { Schema, model } = mongoose;
 
 const lessonsSchema = new Schema({
   teacher: String,
+  students: [{ type: Schema.Types.ObjectId, ref: "User" }],
   title: String,
   styles: String,
   location: String,
