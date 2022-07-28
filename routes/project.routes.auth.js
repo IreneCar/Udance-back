@@ -202,26 +202,28 @@ router.post("/:lessonId/send-email", (req, res, next) => {
     },
   });
 
+  User.findById(req.payload._id).then((user)=>{
+    receivers.forEach((receiver)=>{
 
-  receivers.forEach((receiver)=>{
 
-
-var mailOptions={
-  from:`"Mail prueba"<iron@iron.com>`,
-  to:`${receiver}`,
-  subject:"enviado desde nodemailer",
-  text:`${req.body.message}`
-}
-
-transporter.sendMail(mailOptions,(error,info)=>{
-  if(error){
-    res.status(500).send(error.message)
-  }else{
-    console.log("mail enviado")
-    res.status(200).jsonp(req.body)
-  }
-})
-
+      var mailOptions={
+        from:`${user.name}<iron@iron.com>`,
+        to:`${receiver}`,
+        subject:"enviado desde nodemailer",
+        text:`${req.body.message}`
+      }
+      
+      transporter.sendMail(mailOptions,(error,info)=>{
+        if(error){
+          res.status(500).send(error.message)
+        }else{
+          console.log("mail enviado")
+          res.status(200).jsonp(req.body)
+        }
+      })
+      
+  })
+  
   })
   })
 
