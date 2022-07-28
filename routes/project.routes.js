@@ -18,7 +18,8 @@ router.get("/lessons/:lessonId", (req, res, next) => {
   const { lessonId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(lessonId)) {
-    res.status(400).json({ message: "Specified id is not valid" });
+    res.status(400).json({ 
+      message: "Specified id is not valid" });
     return;
   }
 
@@ -28,5 +29,6 @@ router.get("/lessons/:lessonId", (req, res, next) => {
     .then((lesson) => res.status(200).json(lesson))
     .catch((error) => res.json(error));
 });
+
 
 module.exports = router;

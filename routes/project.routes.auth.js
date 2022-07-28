@@ -222,6 +222,87 @@ router.post("/profile/:lessonId/send-email", (req, res, next) => {
     });
 });
 
+
+
+router.delete("/profile/:lessonId/delete", (req, res, next) => {
+  const { lessonId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(lessonId)) {
+    res.status(400).json({ 
+      message: "Specified id is not valid" });
+    return;
+  }
+ 
+
+Lesson.findById(lessonId)
+.populate("students")
+.then((lesson)=>{
+  var transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL, // generated ethereal user
+      pass: process.env.PASSWORD, // generated ethereal password
+    },
+  });
+
+  lesson.students.forEach((student)=>{
+    
+    var mailOptions = {
+      from: `"Dancemy"<iron@iron.com>`,
+      to: `${student.email}`,
+      subject: "Class eliminated",
+      text: `Your ${lesson.title} has been eliminated,
+      please check your profile`,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("mail enviado");
+        ;
+      }})
+
+    
+  })
+
+
+})
+
+
+
+
+
+User.updateMany({ receivedLessons: `${lessonId}` },
+{$pull: { receivedLessons: lessonId }}
+)
+ 
+  .then(()=>{
+    User.findByIdAndUpdate(req.payload._id, {
+      $pull: { givedLessons: lessonId },
+    }).then(() => {
+      Lesson.findByIdAndRemove(
+        lessonId,(error,deletedLesson)=>{
+          if(!error){
+            res.json(deletedLesson)
+          }else{res.json(error)}
+        })
+    
+    })
+
+
+
+
+
+    });
+   
+  
+
+  
+
+
+})
+
 // PUT  /api/projects/:projectId  -  Updates a specific project by id
 // router.put('/projects/:projectId', (req, res, next) => {
 // 	const { projectId } = req.params;
