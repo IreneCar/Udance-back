@@ -30,7 +30,10 @@ router.get("/profile/gived", (req, res, next) => {
 
 router.get("/profile/received", (req, res, next) => {
   User.findById(req.payload._id)
-    .populate("receivedLessons")
+  .populate({path:"receivedLessons",
+  populate:{
+    path:"teacher"
+  }})
 
     .then((user) => res.json(user.receivedLessons))
     .catch((err) => res.json(err));
@@ -54,7 +57,7 @@ router.post("/lessons", (req, res, next) => {
   } = req.body;
 
   teacher=req.payload._id;
-  
+
   Lesson.create({
     teacher,
     title,
