@@ -43,21 +43,24 @@ We will start our project by first documenting all of the routes and data models
 
 ##### Project routes
 
-| HTTP verb | URL                        | Request body | Action                        |
-| --------- | -------------------------- | ------------ | ----------------------------- |
-| GET       | `/api/projects`            | (empty)      | Returns all the projects      |
-| POST      | `/api/projects`            | JSON         | Adds a new project            |
-| GET       | `/api/projects/:projectId` | (empty)      | Returns the specified project |
-| DELETE    | `/api/projects/:projectId` | (empty)      | Deletes the specified project |
+| HTTP verb | URL              | Request body | Action                       |
+| --------- | ---------------- | ------------ | ---------------------------- |
+| GET       | `/api/lessons`   | (empty)      | Returns all the lessons      |
+| GET       | `/api/:lessonId` | (empty)      | Returns the lesson indicated |
 
-##### Task routes
+##### Project routes auth
 
-| HTTP verb | URL                  | Request body | Action                     |
-| --------- | -------------------- | ------------ | -------------------------- |
-| POST      | `/api/tasks`         | JSON         | Adds a new task            |
-| GET       | `/api/tasks/:taskId` | (empty)      | Returns the specified task |
-| PUT       | `/api/tasks/:taskId` | JSON         | Edits the specified task   |
-| DELETE    | `/api/tasks/:taskId` | (empty)      | Deletes the specified task |
+| HTTP verb | URL                             | Request body | Action                                            |
+| --------- | ------------------------------- | ------------ | ------------------------------------------------- |
+| GET       | `/api/profile`                  | (empty)      | Returns your profile                              |
+| GET       | `/api/profile/gived`            | (empty)      | Returns the gived lessons                         |
+| GET       | `/api/profile/recived`          | (empty)      | Returns the recived lessons                       |
+| POST      | `/api/lessons/`                 | JSON         | Adds a new lesson                                 |
+| POST      | `/lessons/:lessonId/join`       | (empty)      | Adds the lesson to your list                      |
+| GET       | `/lessons/:lessonId/dropOff`    | (empty)      | Delete the lesson from your list                  |
+| PUT       | `/profile/edit`                 | JSON         | Edit your profile                                 |
+| POST      | `/profile/:lessonId/send-email` | JSON         | Send email to all students os the indicated class |
+| DELETE    | `/profile/:lessonId/delete`     | (empty)      | Delete the lesson indicated                       |
 
 ##### Auth routes
 
